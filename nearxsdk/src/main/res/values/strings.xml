@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">nearxsdk</string>
+    <string name="unknown_geofence_error">Unknown Error</string>
+    <string name="geofence_transition_invalid_type">Invalid transition type %d</string>
+    <string name="geofence_transition_entered">Entered</string>
+    <string name="geofence_transition_exited">Exited</string>
+    <string name="geofence_transition_dwell">Dwell</string>
+    <string name="unknown_geofence_transition">Unknown</string>
+    <string name="geofence_not_available">Not available</string>
+    <string name="geofence_too_many_geofences">Too many geofences</string>
+    <string name="geofence_too_many_pending_intents">Too many pending Intents</string>
+    <string name="geofence_transition_notification_text">Geolocation</string>
+    <string name="ok">ok</string>
+    <string name="cancel">cancle</string>
+    <string name="settings">settings</string>
+</resources>

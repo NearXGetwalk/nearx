@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg4"
+    tools:context=".SettingsScreen">
+
+    <include layout="@layout/toolbar"/>
+
+
+    <EditText
+        android:id="@+id/et_mobNo"
+        android:layout_width="250dp"
+        android:layout_height="35dp"
+        android:layout_below="@+id/logo"
+        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/ed_round_bg"
+        android:drawableLeft="@drawable/phone_android"
+        android:drawablePadding="5dp"
+        android:ems="10"
+        android:hint="Mobile Number"
+        android:inputType="textPersonName|number"
+        android:paddingLeft="10dp" />
+
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="250dp"
+        android:layout_height="35dp"
+        android:layout_below="@+id/et_mobNo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/ed_round_bg"
+        android:drawableLeft="@drawable/user_icon"
+        android:drawablePadding="5dp"
+        android:ems="10"
+        android:hint="Name"
+        android:paddingLeft="10dp" />
+
+    <EditText
+        android:id="@+id/et_key"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_name"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:drawablePadding="5dp"
+        android:background="@drawable/ed_round_bg1"
+        android:gravity="top|left"
+        android:lines="10"
+        android:minLines="5"
+        android:textSize="12dp"
+        android:scrollbars="vertical"
+        android:inputType="textMultiLine"
+        android:textStyle="italic"
+        android:hint=" Please paste your App key here"
+        android:paddingLeft="10dp" />
+
+
+    <Button
+        android:id="@+id/btn_submit"
+        android:layout_width="150dp"
+        android:layout_marginTop="30dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_key"
+        android:layout_centerInParent="true"
+        android:text="Update" />
+
+
+</RelativeLayout>
