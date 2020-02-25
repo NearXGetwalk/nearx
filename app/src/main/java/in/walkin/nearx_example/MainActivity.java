@@ -1,6 +1,8 @@
 package in.walkin.nearx_example;
 
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,21 +24,74 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import in.walkin.nearx_example.Interface.UpdateVolleyData;
+import in.walkin.nearx_example.Interface.UpdateNetworkData;
 import in.walkin.nearx_example.adapters.GeofenceAdapter;
 import in.walkin.nearx_example.model.GeofencePojo;
-import in.walkin.nearx_example.network.VolleySingleton;
 import in.walkin.nearxsdk.NearX;
 import in.walkin.nearxsdk.app.Constants;
 import in.walkin.nearxsdk.location.LocationUpdates;
 
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, UpdateVolleyData, LocationUpdates.onLastLocationListener, SwipeRefreshLayout.OnRefreshListener {
+class GetHttpConnection extends AsyncTask<String,String, JSONObject> {
+
+    NearX nearx;
+
+    @Override
+    protected JSONObject doInBackground(String... strings) {
+        try{
+            URL url = new URL(strings[0]);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("token", strings[1]);
+            Log.i(TAG,"strings[1] is.."+strings[1]);
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) { // success
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        connection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                JSONObject responseJSON = new JSONObject(response.toString());
+                return responseJSON;
+            } else {
+                System.out.println("GET request not worked");
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+
+
+        return null;
+    }
+
+    protected void onPostExecute(JSONObject response){
+        try{
+             super.onPostExecute(response);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, UpdateNetworkData, LocationUpdates.onLastLocationListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "MainActivity" ;
     ImageView btn_set;
@@ -104,9 +159,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void callGeofences(Double latitude, Double longitude) {
-        swipeRefreshLayout.setRefreshing(true);
-        String serviceUrl = Constants.GET_GEOFENCES_BASE_URL+"latitude="+latitude+"&longitude="+longitude+"&limit="+Constants.NUMBER_OF_GEOFENCES+"&within="+Constants.GEOFENCES_WITHIN_SPECIFIC_DISTANCE;
-        VolleySingleton.getInstance(getApplicationContext()).addToQueueWithJsonRequestAndResultCode(null, serviceUrl, this, null,1);
+        try{
+
+            String serviceUrl = Constants.GET_GEOFENCES_BASE_URL+"latitude="+latitude+"&longitude="+longitude+"&limit="+Constants.NUMBER_OF_GEOFENCES+"&within="+Constants.GEOFENCES_WITHIN_SPECIFIC_DISTANCE;
+            JSONObject result;
+            swipeRefreshLayout.setRefreshing(true);
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
+                result = new GetHttpConnection().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, serviceUrl, Auth_key, null).get();
+            }
+            else {
+                result = new GetHttpConnection().execute(serviceUrl, Auth_key, null).get();
+            }
+            ((UpdateNetworkData) this).updateFromNetwork(result,200);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     void notifyAdapter(int resultCode) {
@@ -139,11 +208,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void updateFromVolley(Object result) { }
+    public void updateFromNetwork(Object result) { }
 
     @Override
-    public void updateFromVolley(Object result, int resultCode) {
+    public void updateFromNetwork(Object result, int resultCode) {
         if (result instanceof JSONObject) {
+            swipeRefreshLayout.setRefreshing(true);
             Log.d(TAG, "updateFromVolley: "+result.toString());
             if (((JSONObject) result).has("locations")) {
                 try {

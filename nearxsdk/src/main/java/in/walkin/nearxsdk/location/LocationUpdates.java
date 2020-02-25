@@ -3,7 +3,6 @@ package in.walkin.nearxsdk.location;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.util.Log;
@@ -40,45 +39,6 @@ public class LocationUpdates {
 //        createLocationRequest();
     }
 
-//    private void createLocationRequest() {
-//        mLocationRequest = new LocationRequest();
-//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        /* 1 minute */
-//        long LOCATION_FROM_SDK = 60 * 1000;
-//        mLocationRequest.setInterval(LOCATION_FROM_SDK);
-//        /*  10 sec */
-//        long INTERVAL_LOCATION_FROM_OTHER_APPS = 10 * 1000;
-//        mLocationRequest.setFastestInterval(INTERVAL_LOCATION_FROM_OTHER_APPS);
-//    }
-//
-//    public void startLocationUpdates() {
-//        mLocationPendingIntent = getLocationPendingIntent();
-//        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        Task<Void> fusedLocationStatus = mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationPendingIntent);
-//        Log.d(TAG, "Requesting update status: " + fusedLocationStatus.isSuccessful());
-//    }
-//
-//    private PendingIntent getLocationPendingIntent() {
-//        Log.d(TAG, "getLocationPendingIntent");
-//        // Reuse the PendingIntent if we already have it.
-//        if (mLocationPendingIntent != null) {
-//            return mLocationPendingIntent;
-//        }
-//        Intent intent = new Intent(mContext, LocationBroadcastReceiver.class);
-//        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
-//        // calling addGeofences() and removeGeofences().
-//        mLocationPendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        return mLocationPendingIntent;
-//    }
 
     private boolean checkLocationPermission(){
         return ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;

@@ -7,7 +7,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
-import com.android.volley.VolleyError;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
@@ -68,7 +67,6 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService
             Log.w(TAG, "FENCE TRIGGRED");
 
             // Get the geofences that were triggered. A single event can trigger multiple
-            // geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
             // Get the transition details as a String.
@@ -78,12 +76,6 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService
 
                 EventRegistration getBeaconActionService = new EventRegistration(this);
                 getBeaconActionService.postEvent(geofenceTransitionDetails, intent, getApplicationContext());
-
-//                in.walkin.nearxsdk.geofence.Geofence geofence =
-//                        new in.walkin.nearxsdk.geofence.Geofence(intent.getStringExtra(Constants.MOBILE_NUMBER),
-//                                intent.getStringExtra(Constants.AUTH_KEY),getApplicationContext(),true);
-//                geofence.getGeofencesAndRegister();
-
 
         } else {
             // Log the error.
@@ -129,8 +121,6 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService
             e.printStackTrace();
         }
 
-//        Notify.sendNotification(geofenceTransitionString,eventData.toString(),getApplicationContext());
-
         Notify.sendNotification(namesStr+" :   "+geofenceTransitionString,
                 geofenceTransitionString+"   "+intent.getStringExtra(Constants.MOBILE_NUMBER),getApplicationContext());
 
@@ -158,7 +148,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService
     }
 
     @Override
-    public void onGetBeaconFailure(VolleyError err) {
-        Log.e(TAG, "Event Registration Failure >>> "+err);
+    public void onGetBeaconFailure(Exception e) {
+        Log.e(TAG, "Event Registration Failure >>> "+e);
     }
 }

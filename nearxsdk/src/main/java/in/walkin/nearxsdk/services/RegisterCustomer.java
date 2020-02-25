@@ -1,31 +1,96 @@
 package in.walkin.nearxsdk.services;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import in.walkin.nearxsdk.NearX;
 import in.walkin.nearxsdk.app.Constants;
 import in.walkin.nearxsdk.app.NearXPref;
 import in.walkin.nearxsdk.geofence.Geofence;
-import in.walkin.nearxsdk.network.VolleySingleton;
 import in.walkin.nearxsdk.utils.DeviceDetails;
 
-public class RegisterCustomer {
+import static android.content.ContentValues.TAG;
 
-//    private static CustomerSingleton mCustomer = CustomerSingleton.getInstance();
+class PostHttpConnection extends AsyncTask<String,String,String> {
+
+    @Override
+    protected String doInBackground(String... strings) {
+        try{
+            URL url = new URL(strings[0]);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+
+            connection.setRequestMethod(strings[1]);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("token", Geofence.getAuthToken());
+            connection.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+            wr.writeBytes(strings[2]);
+            wr.flush();
+            wr.close();
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    connection.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            System.out.println(response.toString());
+            return response.toString();
+
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+
+
+        return null;
+    }
+
+    protected void onPostExecute(String response){
+
+        System.out.println("response <<<<<" + response);
+        super.onPostExecute(response);
+            try {
+                 onVerifyCustomerSuccess(true);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                onVerifyCustomerSuccess(true);
+            }
+    }
+
+    public void onVerifyCustomerSuccess(boolean nearXUser) {
+        if (nearXUser) {
+            Log.d(TAG,"Successful onVerifyCustomer true");
+            Geofence geofence = new Geofence(NearXPref.getMobileNum(),NearX.getAuthToken(),NearX.getContect(), false);
+            geofence.getGeofencesAndRegister();
+        } else {
+            Log.d(TAG, "Successful onVerifyCustomer false");
+        }
+    }
+
+
+    public void onVerifyCustomerFailure() {
+        Log.d(TAG, "Failure onVerifyCustomer");
+    }
+
+}
+
+public class RegisterCustomer {
 
     private static final String TAG = "RegisterCustomerAndGe";
     private Context mContext;
@@ -33,9 +98,6 @@ public class RegisterCustomer {
     public RegisterCustomer(Context mContext) {
         this.mContext = mContext;
     }
-
-
-
 
 
     public void verifyValidCustomerAndStartScanning() {
@@ -56,60 +118,17 @@ public class RegisterCustomer {
         }
 
         Log.e("VERIFY CUSTOMER", jsonObject + "");
+        System.out.println("server url before req in registerCustomer>>>>>" + serviceUrl);
 
-//        VolleySingleton.getInstance(NearX.getContect()).addToQueueWithJsonRequest(jsonObject, serviceUrl, mContext, null);
+        try {
+            new PostHttpConnection().execute(serviceUrl,"POST",jsonObject.toString());
 
-
-
-        RequestQueue queue = VolleySingleton.getInstance(NearX.getContect()).getQueue(NearX.getContect());
-
-        System.out.println("server url before req>>>>>" + serviceUrl);
-
-        JsonObjectRequest jsonRequest = new JsonObjectRequest( Request.Method.POST, serviceUrl, jsonObject,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        onVerifyCustomerSuccess(true);
-
-                }
-            }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println("response in error<<<<<" + error);
-
-                        onVerifyCustomerSuccess(true);
-
-                    }
-
-            })
-            {  @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<String, String>();
-                    headers.put("token", NearX.getAuthToken());
-                    return headers;
-                }
-            };
-
-        queue.add(jsonRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
     }
 
-
-        public void onVerifyCustomerSuccess(boolean nearXUser) {
-            if (nearXUser) {
-                Log.d(TAG,"Successful onVerifyCustomer true");
-                Geofence geofence = new Geofence(NearXPref.getMobileNum(),NearX.getAuthToken(),NearX.getContect(), false);
-                geofence.getGeofencesAndRegister();
-            } else {
-                Log.d(TAG, "Successful onVerifyCustomer false");
-            }
-        }
-
-
-        public void onVerifyCustomerFailure() {
-            Log.d(TAG, "Failure onVerifyCustomer");
-        }
 
 
 }

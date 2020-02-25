@@ -6,11 +6,9 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Map;
 
-
-import in.walkin.nearxsdk.app.Notify;
+import in.walkin.nearxsdk.location.LocationUpdates;
 import in.walkin.nearxsdk.model.GeofencePojo;
 import in.walkin.nearxsdk.services.GetGeofences;
-import in.walkin.nearxsdk.location.LocationUpdates;
 import in.walkin.nearxsdk.workmanager.ReRegisterWorkManager;
 
 /**
@@ -39,7 +37,7 @@ public class Geofence implements
     }
 
 
-    public static Context getContect(){
+    public static Context getContext(){
         return mContext;
     }
     public static String getAuthToken() { return mAuthkey; }
